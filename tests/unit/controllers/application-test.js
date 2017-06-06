@@ -1,22 +1,25 @@
-import { moduleFor, test } from 'ember-qunit';
-import { make, manualSetup } from 'ember-data-factory-guy';
+import { moduleFor, test } from "ember-qunit";
+import Ember from "ember";
 
-moduleFor('controller:application', 'Unit | Controller | application', {
+moduleFor("controller:application", "Unit | Controller | application", {
   // Specify the other units that are required for this test.
-  needs: ['model:user'],
+  needs: ["model:user", "model:post"],
   beforeEach() {
-    manualSetup(this.container);
+    this.store = this.container.lookup("service:store");
   }
 });
 
 // Replace this with your real tests.
-test('it exists', function(assert) {
-  let user1 = make('user', {name: 'john'});
-  let user2 = make('user', {name: 'jane'});
-  let user3 = make('user', {name: 'joe'});
-  let user4 = make('user', {name: 'johnny'});
+test("it exists", function(assert) {
+  Ember.run(() => {
+    let post1 = this.store.createRecord("post", { title: "foo" });
+    let post2 = this.store.createRecord("post", { title: "bar" });
+    let post3 = this.store.createRecord("post", { title: "baz" });
 
-  let model = [user1, user2, user3, user4];
-  let controller = this.subject({ model });
-  assert.deepEqual(controller.get('nameComputed'), ['john', 'jane', 'joe', 'johnny']);
+    let model = this.store.createRecord("user", {
+      posts: [post1, post2, post3]
+    });
+    let controller = this.subject({ model });
+    assert.deepEqual(controller.get("nameComputed"), ["foo", "bar", "baz"]);
+  });
 });
